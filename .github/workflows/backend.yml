@@ -3,10 +3,6 @@ on:
   push:
     branches:
       - main
-    paths:
-    - "src/**"
-    - "src/Services/CardsService/Dockerfile.prod"
-    - "docker-compose.prod.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

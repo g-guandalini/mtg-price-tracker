@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL || "/api"
 })
 
 api.interceptors.request.use(config => {
@@ -12,9 +12,6 @@ api.interceptors.request.use(config => {
     if(auth.token){
         config.headers.Authorization =
             `Bearer ${auth.token}`
-    }
-    if(auth.token){
-        config.headers.Authorization = `Bearer ${auth.token}`
     }
     return config
 

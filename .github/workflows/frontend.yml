@@ -5,7 +5,6 @@ on:
       - main
     paths:
       - "frontend/**"
-      - "docker/frontend/**"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,9 +22,11 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: ./frontend/mtg-price-tracker-web
-          file: docker/frontend/Dockerfile.prod
+          file: ./frontend/mtg-price-tracker-web/Dockerfile.prod
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/mtg-price-tracker-web:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/mtg-price-tracker-web:latest
+            ghcr.io/${{ github.repository_owner }}/mtg-price-tracker-web:${{ github.sha }}
       - uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}

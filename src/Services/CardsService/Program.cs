@@ -130,5 +130,4 @@ if (builder.Configuration.GetValue<bool>("RUN_MIGRATIONS"))
     return;
 }
 
-
 app.Run();

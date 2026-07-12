@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths:
+    - "src/**"
+    - "src/Services/CardsService/Dockerfile.prod"
+    - "docker-compose.prod.yml"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,4 +37,11 @@ jobs:
           script: |
             cd /root/mtg-price-tracker
             docker compose -f docker-compose.prod.yml pull
+
+            docker run --rm \
+              --network app_app-network \
+              --env-file /root/mtg-price-tracker/.env \
+              -e RUN_MIGRATIONS=true \
+              ghcr.io/g-guandalini/cards-service:latest
+
             docker compose -f docker-compose.prod.yml up -d

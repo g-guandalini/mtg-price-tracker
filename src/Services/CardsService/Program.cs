@@ -121,4 +121,14 @@ app.MapAuthEndpoints();
 app.MapTrackedCardsEndpoints();
 
 app.MapGet("/", () => "CardsService running");
+
+if (builder.Configuration.GetValue<bool>("RUN_MIGRATIONS"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<CardsDbContext>();
+    await db.Database.MigrateAsync();
+    return;
+}
+
+
 app.Run();

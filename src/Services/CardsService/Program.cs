@@ -29,7 +29,7 @@ Console.WriteLine(
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-// Configurações de EF Core (PostgreSQL) e MediatR
+// Configurações de EF Core (PostgreSQL)
 builder.Services.AddDbContext<CardsService.Infrastructure.CardsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("CardsDatabase")));
 

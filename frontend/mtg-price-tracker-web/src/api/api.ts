@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
 export const api = axios.create({
-    baseURL:'http://localhost:5072'
+  baseURL: import.meta.env.VITE_API_URL
 })
 
 api.interceptors.request.use(config => {
@@ -19,3 +19,22 @@ api.interceptors.request.use(config => {
     return config
 
 })
+
+api.interceptors.response.use(
+    response => response,
+    error => {
+
+        if (axios.isAxiosError(error)) {
+
+            const message =
+                error.response?.data?.message ??
+                "Erro inesperado.";
+
+            return Promise.reject(new Error(message));
+        }
+
+        return Promise.reject(
+            new Error("Erro inesperado.")
+        );
+    }
+);

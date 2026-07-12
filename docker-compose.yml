@@ -5,67 +5,96 @@ services:
     container_name: mtg-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: mtg
-      POSTGRES_USER: mtg
-      POSTGRES_PASSWORD: mtg
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  rabbitmq:
-    image: rabbitmq:4-management
-    container_name: mtg-rabbitmq
-    restart: unless-stopped
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: mtg
-      RABBITMQ_DEFAULT_PASS: mtg
+  # rabbitmq:
+  #   image: rabbitmq:4-management
+  #   container_name: mtg-rabbitmq
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: mtg
+  #     RABBITMQ_DEFAULT_PASS: mtg
 
-  kafka:
-    image: apache/kafka:4.1.1
-    container_name: mtg-kafka
-    restart: unless-stopped
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-    volumes:
-      - kafka_data:/var/lib/kafka/data
+  # kafka:
+  #   image: apache/kafka:4.1.1
+  #   container_name: mtg-kafka
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9092:9092"
+  #     - "9093:9093"
+  #   environment:
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_PROCESS_ROLES: broker,controller
+  #     KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+  #     CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+  #   volumes:
+  #     - kafka_data:/var/lib/kafka/data
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: mtg-kafka-ui
+  # kafka-ui:
+  #   image: provectuslabs/kafka-ui:latest
+  #   container_name: mtg-kafka-ui
+  #   depends_on:
+  #     - kafka
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: local
+  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  #seq:
+   # image: datalust/seq:latest
+   # container_name: mtg-seq
+   # restart: unless-stopped
+   # environment:
+   #   ACCEPT_EULA: Y
+   # ports:
+   #   - "5341:80"
+   # volumes:
+   #   - seq_data:/data
+  
+  cards-service:
+    build:
+      context: ./src/Services/CardsService
+      dockerfile: Dockerfile.dev
+    container_name: mtg-cards-service
+    restart: unless-stopped
     depends_on:
-      - kafka
+      - postgres
     ports:
-      - "8080:8080"
+      - "5072:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-
-  seq:
-    image: datalust/seq:latest
-    container_name: mtg-seq
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__CardsDatabase: Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+  
+  frontend:
+    build:
+      context: ./frontend/mtg-price-tracker-web
+      dockerfile: Dockerfile.dev
+    container_name: mtg-frontend
     restart: unless-stopped
-    environment:
-      ACCEPT_EULA: Y
     ports:
-      - "5341:80"
-    volumes:
-      - seq_data:/data
+      - "5173:5173"
+    depends_on:
+      - cards-service
 
 volumes:
   postgres_data:
-  kafka_data:
-  seq_data:
+  #kafka_data:
+  #seq_data:
+

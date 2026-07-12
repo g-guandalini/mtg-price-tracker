@@ -49,6 +49,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { register } from '../api/authApi'
+import axios from "axios"
 
 const router = useRouter()
 
@@ -80,9 +81,8 @@ async function handleRegister() {
         })
         router.push("/login?registered=true")
     }
-    catch {
-        message.value =
-            "Erro ao criar usuário."
+    catch (error) {
+        message.value = (error as Error).message
     }
 }
 

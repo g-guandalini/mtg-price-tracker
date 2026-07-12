@@ -39,7 +39,7 @@ export const useAuthStore = defineStore("auth", {
                 if (parts.length < 2)
                     return;
                 const payload = JSON.parse(
-                    atob(parts[1])
+                    (parts && parts[1]) ? atob(parts[1]): ""
                 );
                 this.username =
                     payload.username ?? "";

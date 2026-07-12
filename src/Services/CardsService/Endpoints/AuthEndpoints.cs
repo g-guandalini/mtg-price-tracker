@@ -21,15 +21,24 @@ public static class AuthEndpoints
                     request.Email,
                     request.Password);
 
-
-            var id =
-                await handler.Handle(command);
-
-
-            return Results.Ok(new
+            try
             {
-                UserId = id
-            });
+                var id =
+                    await handler.Handle(command);
+
+
+                return Results.Ok(new
+                {
+                    UserId = id
+                });
+            }
+            catch (UniqueUsernameEmailException ex)
+            {
+                return Results.Conflict(new
+                {
+                    message = ex.Message
+                });
+            }
         });
 
 

@@ -34,5 +34,13 @@ public class CardsDbContext : DbContext
             .HasOne(x => x.Card)
             .WithMany(x => x.TrackedByUsers)
             .HasForeignKey(x => x.CardId);
+
+         modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
     }
 }

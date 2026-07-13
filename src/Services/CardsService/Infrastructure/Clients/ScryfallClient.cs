@@ -20,7 +20,7 @@ public class ScryfallClient : IScryfallClient
     {
 
         var query = Uri.EscapeDataString($"name:\"{name}\"");
-        var url = $"cards/search?q={query}";
+        var url = $"cards/search?q={query}&unique=prints";
 
         var response = await _httpClient.GetAsync(url);
 

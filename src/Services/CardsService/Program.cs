@@ -10,6 +10,7 @@ using CardsService.Endpoints;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using AuthService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +103,6 @@ app.UseHttpsRedirection();
 app.MapCardsEndpoints();
 app.MapTrackedCardsEndpoints();
 
-app.MapGet("/", () => "CardsService running");
+await app.ApplyMigrationsAsync();
 
 app.Run();

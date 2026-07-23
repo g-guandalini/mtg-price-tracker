@@ -24,9 +24,3 @@ services:
       - "80"
     networks:
       - app-network
-  cards-migration:
-    image: ghcr.io/g-guandalini/cards-service:latest
-    command: dotnet ef database update
-  auth-migration:
-    image: ghcr.io/g-guandalini/auth-service:latest
-    command: dotnet ef database update

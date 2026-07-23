@@ -1,0 +1,46 @@
+services:
+  cards-service:
+    image: ghcr.io/g-guandalini/cards-service:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__CardsDatabase: Host=postgres;Database=${MTG_POSTGRES_DB};Username=${MTG_POSTGRES_USER};Password=${MTG_POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      Jwt__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES}
+    expose:
+      - "8080"
+    networks:
+      - app_app-network
+
+  auth-service:
+    image: ghcr.io/g-guandalini/auth-service:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__AuthDatabase: Host=postgres;Database=${MTG_POSTGRES_DB};Username=${MTG_POSTGRES_USER};Password=${MTG_POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      Jwt__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES}
+    expose:
+      - "8080"
+    networks:
+      - app_app-network
+
+  mtg-frontend:
+    image: ghcr.io/g-guandalini/mtg-price-tracker-web:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - app_app-network
+
+networks:
+  app_app-network:
+    external: true

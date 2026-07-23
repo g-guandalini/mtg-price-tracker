@@ -1,7 +1,7 @@
-using AuthService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using CardsService.Infrastructure;
 
-namespace AuthService.Extensions;
+namespace CardsService.Extensions;
 
 public static class MigrationExtensions
 {

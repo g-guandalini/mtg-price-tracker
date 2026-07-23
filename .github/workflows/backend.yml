@@ -6,6 +6,7 @@ on:
     paths:
     - "src/**"
     - "src/Services/CardsService/Dockerfile.prod"
+    - "src/Services/AuthService/Dockerfile.prod"
     - "docker-compose.prod.yml"
 jobs:
   build:
@@ -29,6 +30,14 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/cards-service:latest
             ghcr.io/${{ github.repository_owner }}/cards-service:${{ github.sha }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./src/Services/AuthService
+          file: ./src/Services/AuthService/Dockerfile.prod
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/auth-service:latest
+            ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
       - uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -37,6 +46,7 @@ jobs:
           script: |
             cd /root/mtg-price-tracker
             docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml run --rm auth-migration
             docker compose -f docker-compose.prod.yml run --rm cards-migration
             docker compose -f docker-compose.prod.yml up -d
             docker exec nginx nginx -t

@@ -15,4 +15,18 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    proxy: {
+      '/api/auth': {
+        target: 'http://auth-service:8080',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      },
+      '/api/cards': {
+        target: 'http://cards-service:8080',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      }
+    }
+  }
 })

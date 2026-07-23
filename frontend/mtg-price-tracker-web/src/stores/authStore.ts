@@ -41,8 +41,9 @@ export const useAuthStore = defineStore("auth", {
                 const payload = JSON.parse(
                     (parts && parts[1]) ? atob(parts[1]): ""
                 );
+                console.log(payload);
                 this.username =
-                    payload.username ?? "";
+                    payload.unique_name ?? "";
             }
             catch {
                 this.logout();

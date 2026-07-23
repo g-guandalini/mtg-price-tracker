@@ -1,30 +1,27 @@
-using CardsService.Infrastructure;
+using AuthService.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using CardsService.Application.Cards.Handlers;
-using CardsService.Application.TrackedCards.Handlers;
-using CardsService.Application.Interfaces;
-using CardsService.Infrastructure.Clients;
-using CardsService.Infrastructure.Configuration;
+using AuthService.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using CardsService.Endpoints;
-using Microsoft.IdentityModel.Tokens;
+using AuthService.Application.Identity.Handlers;
+using AuthService.Infrastructure.Security;
+using AuthService.Endpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();;
+builder.Services.AddSwaggerGen();
 // Configurações de EF Core (PostgreSQL)
-builder.Services.AddDbContext<CardsService.Infrastructure.CardsDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("CardsDatabase")));
+builder.Services.AddDbContext<AuthService.Infrastructure.AuthDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AuthDatabase")));
 
-builder.Services.AddScoped<GetCardByIdHandler>();
-builder.Services.AddScoped<CreateCardHandler>();
-builder.Services.AddScoped<SearchCardsHandler>();
-builder.Services.AddScoped<CreateTrackedCardHandler>();
+builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<RegisterUserHandler>();
+
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -48,27 +45,6 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-builder.Services.Configure<ScryfallOptions>(
-    builder.Configuration.GetSection(ScryfallOptions.SectionName));
-
-builder.Services.AddHttpClient<IScryfallClient, ScryfallClient>(
-    (provider, client) =>
-    {
-        var options =
-            provider.GetRequiredService<
-                IOptions<ScryfallOptions>>().Value;
-
-        client.BaseAddress = new Uri(options.BaseUrl);
-
-        client.DefaultRequestHeaders.Add(
-            "User-Agent",
-            options.UserAgent);
-
-        client.DefaultRequestHeaders.Add(
-            "Accept",
-            options.Accept);
-    });
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend",
@@ -83,13 +59,13 @@ builder.Services.AddCors(options =>
         });
 });
 
+
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors("frontend");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -99,9 +75,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapCardsEndpoints();
-app.MapTrackedCardsEndpoints();
-
-app.MapGet("/", () => "CardsService running");
+app.MapAuthEndpoints();
 
 app.Run();

@@ -7,8 +7,6 @@ public class CardsDbContext : DbContext
 {
     public DbSet<Card> Cards { get; set; }
 
-    public DbSet<User> Users { get; set; }
-
     public DbSet<TrackedCard> TrackedCards { get; set; }
 
 
@@ -21,26 +19,7 @@ public class CardsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("mtg_cards");
         base.OnModelCreating(modelBuilder);
-
-
-        modelBuilder.Entity<TrackedCard>()
-            .HasOne(x => x.User)
-            .WithMany(x => x.TrackedCards)
-            .HasForeignKey(x => x.UserId);
-
-
-        modelBuilder.Entity<TrackedCard>()
-            .HasOne(x => x.Card)
-            .WithMany(x => x.TrackedByUsers)
-            .HasForeignKey(x => x.CardId);
-
-         modelBuilder.Entity<User>()
-            .HasIndex(u => u.Username)
-            .IsUnique();
-
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
     }
 }

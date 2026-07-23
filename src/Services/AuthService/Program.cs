@@ -8,6 +8,7 @@ using AuthService.Endpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AuthService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,4 +78,8 @@ app.UseHttpsRedirection();
 
 app.MapAuthEndpoints();
 
+await app.ApplyMigrationsAsync();
+
 app.Run();
+
+

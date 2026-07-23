@@ -8,6 +8,15 @@ services:
       - "8080"
     networks:
       - app-network
+  auth-service:
+    image: ghcr.io/g-guandalini/auth-service:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "8080"
+    networks:
+      - app-network
   frontend:
     image: ghcr.io/g-guandalini/mtg-price-tracker-web:latest
     restart: unless-stopped
@@ -15,3 +24,9 @@ services:
       - "80"
     networks:
       - app-network
+  cards-migration:
+    image: ghcr.io/seu-usuario/cards-service:latest
+    command: dotnet ef database update
+  auth-migration:
+    image: ghcr.io/seu-usuario/auth-service:latest
+    command: dotnet ef database update

@@ -105,4 +105,5 @@ app.MapTrackedCardsEndpoints();
 
 await app.ApplyMigrationsAsync();
 
+
 app.Run();

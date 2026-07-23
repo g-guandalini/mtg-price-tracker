@@ -10,7 +10,7 @@ using CardsService.Endpoints;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
-using AuthService.Extensions;
+using CardsService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
